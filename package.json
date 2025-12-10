@@ -1,10 +1,36 @@
 {
-  "name": "reactive_network_leverage_looping_strategy",
+  "name": "reactive-oracle-mirror",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Cross-Chain Price Feed Oracle on Reactive Network",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "step:1": "hardhat run scripts/step_1_deploy_weth.ts --network sepolia",
+    "step:2": "hardhat run scripts/step_2_deploy_usdt.ts --network sepolia",
+    "step:3": "hardhat run scripts/step_3_deploy_router.ts --network sepolia",
+    "step:4": "hardhat run scripts/step_4_deploy_lending_pool.ts --network sepolia",
+    "step:5": "hardhat run scripts/step_5_init_register_assets.ts --network sepolia",
+    "step:6": "hardhat run scripts/step_6_init_set_prices.ts --network sepolia",
+    "step:7": "hardhat run scripts/step_7_init_mint_tokens.ts --network sepolia",
+    "step:8": "hardhat run scripts/step_8_deploy_leverage_account.ts --network sepolia",
+    "step:9": "hardhat run scripts/step_9_deploy_reactive.ts --network reactive",
+    "test:loop": "hardhat run scripts/test_leverage_loop.ts --network sepolia",
+    "test:repay": "hardhat run scripts/test_repay_partial.ts --network sepolia",
+    "test:close": "hardhat run scripts/test_full_close_position.ts --network sepolia",
+    "check:position": "hardhat run scripts/check_position.ts --network sepolia"
   },
-  "private": true
+  "dependencies": {
+    "@chainlink/contracts": "^1.5.0",
+    "@openzeppelin/contracts": "^5.2.0",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2",
+    "@types/node": "^22.0.0",
+    "@types/mocha": "^10.0.10",
+    "@types/chai": "^4.3.0"
+  }
 }
