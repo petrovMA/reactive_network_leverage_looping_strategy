@@ -1,63 +1,34 @@
-import { ethers, network } from "hardhat";
-import * as fs from "fs";
-import * as path from "path";
-
-// Helper function to write deployment result to JSON
-function writeDeploymentResult(filePath: string, data: any): void {
-  const fullPath = path.join(__dirname, filePath);
-  fs.writeFileSync(fullPath, JSON.stringify(data, null, 2), "utf-8");
-}
+import { ethers } from "hardhat";
+import { writeResult, getDeployerInfo, logHeader } from "./utils";
 
 async function main() {
-  console.log("🚀 Deploying USDT Token to Sepolia...\n");
+  console.log("Deploying USDT Token...\n");
 
-  // Get deployer account
-  const [deployer] = await ethers.getSigners();
-  const deployerAddress = await deployer.getAddress();
-  const balance = await ethers.provider.getBalance(deployerAddress);
+  const { address, balanceEth, network, chainId } = await getDeployerInfo();
+  console.log(`Network: ${network} (Chain ID: ${chainId})`);
+  console.log(`Deployer: ${address}`);
+  console.log(`Balance: ${balanceEth} ETH\n`);
 
-  console.log(`📡 Network: ${network.name} (Chain ID: ${network.config.chainId})`);
-  console.log(`👤 Deployer: ${deployerAddress}`);
-  console.log(`💰 Balance: ${ethers.formatEther(balance)} ETH\n`);
+  const MockToken = await ethers.getContractFactory("MockToken");
+  const usdt = await MockToken.deploy("Tether USD", "USDT");
+  await usdt.waitForDeployment();
 
-  // Deploy MockToken (USDT)
-  console.log("----------------------------------------------------");
-  console.log("⏳ Deploying MockToken (USDT)...");
-  const MockTokenFactory = await ethers.getContractFactory("MockToken");
-  const usdtToken = await MockTokenFactory.deploy("Tether USD", "USDT");
-  await usdtToken.waitForDeployment();
-  const usdtAddress = await usdtToken.getAddress();
-  const deployTx = usdtToken.deploymentTransaction();
-  console.log("✅ USDT Token deployed!");
-  console.log(`📍 Address: ${usdtAddress}`);
-  console.log(`📝 Constructor: "Tether USD", "USDT"`);
-  console.log("----------------------------------------------------\n");
+  const usdtAddress = await usdt.getAddress();
+  const txHash = usdt.deploymentTransaction()?.hash || "";
 
-  // Save deployment result to JSON
-  const deploymentResult = {
+  writeResult("step_2_deploy_usdt_result.json", {
     address: usdtAddress,
-    network: network.name,
-    txHash: deployTx?.hash || "",
+    network,
+    txHash,
     deployedAt: new Date().toISOString()
-  };
+  });
 
-  const resultFile = "step_2_deploy_usdt_result.json";
-  writeDeploymentResult(resultFile, deploymentResult);
-  console.log(`💾 Deployment result saved to: ${resultFile}\n`);
-
-  console.log("====================================================");
-  console.log("📋 DEPLOYMENT SUMMARY");
-  console.log("====================================================");
-  console.log(`USDT Token: ${usdtAddress}`);
-  console.log(`Network:    ${network.name}`);
-  console.log(`Tx Hash:    ${deployTx?.hash}`);
-  console.log("");
-  console.log("🔍 View on Etherscan:");
-  console.log(`https://sepolia.etherscan.io/address/${usdtAddress}`);
+  logHeader("DEPLOYMENT COMPLETE");
+  console.log(`USDT: ${usdtAddress}`);
+  console.log(`Tx: ${txHash}`);
+  console.log(`Etherscan: https://sepolia.etherscan.io/address/${usdtAddress}`);
   console.log("====================================================\n");
-
-  console.log("✅ USDT deployment complete!");
-  console.log("\n💡 Next step: npm run step:3");
+  console.log("Next: npm run step:3");
 }
 
 main().catch((error) => {

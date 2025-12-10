@@ -1,122 +1,63 @@
-import { ethers, network } from "hardhat";
-import * as fs from "fs";
-import * as path from "path";
-
-// Helper function to read deployment result from JSON
-function readDeploymentResult(filePath: string): any {
-  const fullPath = path.join(__dirname, filePath);
-
-  if (!fs.existsSync(fullPath)) {
-    throw new Error(`File not found: ${filePath}`);
-  }
-
-  const fileContent = fs.readFileSync(fullPath, "utf-8");
-  return JSON.parse(fileContent);
-}
-
-// Helper function to write result to JSON
-function writeResult(filePath: string, data: any): void {
-  const fullPath = path.join(__dirname, filePath);
-  fs.writeFileSync(fullPath, JSON.stringify(data, null, 2), "utf-8");
-}
-
-// Helper function to validate address
-function validateAddress(address: string): boolean {
-  if (!address) return false;
-  if (address === "0x0000000000000000000000000000000000000000") return false;
-  return true;
-}
+import { ethers } from "hardhat";
+import { readResult, writeResult, getDeployerInfo, isValidAddress, logHeader } from "./utils";
 
 async function main() {
-  console.log("🔧 Phase 1: Setting Token Prices in MockRouter...\n");
+  console.log("Setting token prices in MockRouter...\n");
 
-  // Read deployment results
-  console.log("📖 Reading deployment results...\n");
-
-  let wethData: any;
-  let usdtData: any;
-  let routerData: any;
-
+  // Read addresses
+  let wethData: any, usdtData: any, routerData: any;
   try {
-    wethData = readDeploymentResult("step_1_deploy_weth_result.json");
-    usdtData = readDeploymentResult("step_2_deploy_usdt_result.json");
-    routerData = readDeploymentResult("step_3_deploy_router_result.json");
-  } catch (error: any) {
-    console.error("❌ ERROR: Missing deployment files!");
-    console.error("   Please run deployment scripts first:");
-    console.error("   1. npm run step:1 (deploy WETH)");
-    console.error("   2. npm run step:2 (deploy USDT)");
-    console.error("   3. npm run step:3 (deploy router)\n");
+    wethData = readResult("step_1_deploy_weth_result.json");
+    usdtData = readResult("step_2_deploy_usdt_result.json");
+    routerData = readResult("step_3_deploy_router_result.json");
+  } catch {
+    console.error("ERROR: Missing deployment files!");
+    console.error("Please run steps 1-3 first.\n");
     process.exit(1);
   }
 
-  const WETH_ADDRESS = wethData.address;
-  const USDT_ADDRESS = usdtData.address;
-  const ROUTER_ADDRESS = routerData.address;
+  const WETH = wethData.address;
+  const USDT = usdtData.address;
+  const ROUTER = routerData.address;
 
-  // Validate addresses
-  if (!validateAddress(WETH_ADDRESS) || !validateAddress(USDT_ADDRESS) || !validateAddress(ROUTER_ADDRESS)) {
-    console.error("❌ ERROR: One or more addresses are invalid!");
+  if (!isValidAddress(WETH) || !isValidAddress(USDT) || !isValidAddress(ROUTER)) {
+    console.error("ERROR: One or more addresses are invalid!");
     process.exit(1);
   }
 
-  console.log(`✅ WETH:   ${WETH_ADDRESS}`);
-  console.log(`✅ USDT:   ${USDT_ADDRESS}`);
-  console.log(`✅ Router: ${ROUTER_ADDRESS}\n`);
+  const { address, balanceEth, network, chainId } = await getDeployerInfo();
+  console.log(`Network: ${network} (Chain ID: ${chainId})`);
+  console.log(`Deployer: ${address}`);
+  console.log(`Balance: ${balanceEth} ETH\n`);
 
-  // Get deployer account
-  const [deployer] = await ethers.getSigners();
-  const deployerAddress = await deployer.getAddress();
-  const balance = await ethers.provider.getBalance(deployerAddress);
+  const router = await ethers.getContractAt("MockRouter", ROUTER);
 
-  console.log(`📡 Network: ${network.name} (Chain ID: ${network.config.chainId})`);
-  console.log(`👤 Deployer: ${deployerAddress}`);
-  console.log(`💰 Balance: ${ethers.formatEther(balance)} ETH\n`);
+  // Set prices: WETH = $3000, USDT = $1
+  const wethPrice = ethers.parseEther("3000");
+  const usdtPrice = ethers.parseEther("1");
 
-  // Get router contract instance
-  const router = await ethers.getContractAt("MockRouter", ROUTER_ADDRESS);
+  console.log("Setting prices...");
+  const tx1 = await router.setPrice(WETH, wethPrice);
+  await tx1.wait();
+  console.log(`WETH price set to $3000 (tx: ${tx1.hash})`);
 
-  // Set token prices
-  console.log("----------------------------------------------------");
-  console.log("⏳ Setting token prices in MockRouter...");
+  const tx2 = await router.setPrice(USDT, usdtPrice);
+  await tx2.wait();
+  console.log(`USDT price set to $1 (tx: ${tx2.hash})\n`);
 
-  const wethPrice = ethers.parseEther("3000"); // $3000 USD
-  const usdtPrice = ethers.parseEther("1");    // $1 USD
-
-  const setPriceWethTx = await router.setPrice(WETH_ADDRESS, wethPrice);
-  await setPriceWethTx.wait();
-  console.log(`✅ WETH price set to $3000`);
-  console.log(`   Tx Hash: ${setPriceWethTx.hash}`);
-
-  const setPriceUsdtTx = await router.setPrice(USDT_ADDRESS, usdtPrice);
-  await setPriceUsdtTx.wait();
-  console.log(`✅ USDT price set to $1`);
-  console.log(`   Tx Hash: ${setPriceUsdtTx.hash}`);
-  console.log("----------------------------------------------------\n");
-
-  // Save result to JSON
-  const result = {
+  writeResult("step_5_init_set_prices_result.json", {
     completed: true,
     wethPrice: "3000",
     usdtPrice: "1",
     timestamp: new Date().toISOString(),
-    txHashes: [setPriceWethTx.hash, setPriceUsdtTx.hash]
-  };
+    txHashes: [tx1.hash, tx2.hash]
+  });
 
-  const resultFile = "step_5_init_set_prices_result.json";
-  writeResult(resultFile, result);
-  console.log(`💾 Result saved to: ${resultFile}\n`);
-
-  console.log("====================================================");
-  console.log("📋 SUMMARY");
-  console.log("====================================================");
-  console.log("✅ Prices Set:");
-  console.log("   - WETH: $3000");
-  console.log("   - USDT: $1");
+  logHeader("PRICES SET");
+  console.log("WETH: $3000");
+  console.log("USDT: $1");
   console.log("====================================================\n");
-
-  console.log("✅ Price setting complete!");
-  console.log("\n💡 Next step: npm run step:6 (mint tokens)");
+  console.log("Next: npm run step:6");
 }
 
 main().catch((error) => {

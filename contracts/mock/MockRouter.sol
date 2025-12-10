@@ -1,28 +1,21 @@
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
 import "./MockToken.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-// ---------------------------------------------------------
-// 2. Mock Router (DEX + Oracle)
-// ---------------------------------------------------------
+/// @title MockRouter - DEX + Oracle simulator for testing
 contract MockRouter is Ownable {
-    // Цены активов в USD (с 8 знаками точности, как Chainlink, или просто raw value).
-    // Для простоты: 1 WETH = 3000, 1 USDT = 1.
-    // Храним price * 1e18 для точности при делении.
+    // Asset prices in USD (18 decimals). Example: WETH = 3000e18, USDT = 1e18
     mapping(address => uint256) public prices;
 
     constructor() Ownable(msg.sender) {}
 
-    // Установка цены владельцем (для симуляции движения рынка)
-    // price example: WETH = 3000 * 10**18, USDT = 1 * 10**18
     function setPrice(address token, uint256 price) external onlyOwner {
         prices[token] = price;
     }
 
-    // Симуляция Uniswap V2: swapExactTokensForTokens
-    // Сжигает входной токен у юзера, минтит выходной токен юзеру.
-    // Игнорируем path (кроме [0] и [last]) и deadline.
+    /// @notice Uniswap V2 style swap - burns tokenIn, mints tokenOut
     function swapExactTokensForTokens(
         uint256 amountIn,
         uint256 amountOutMin,
@@ -38,22 +31,14 @@ contract MockRouter is Ownable {
         uint256 priceOut = prices[tokenOut];
         require(priceIn > 0 && priceOut > 0, "Price not set");
 
-        // Математика обмена: (AmountIn * PriceIn) / PriceOut
-        // Так как decimals везде 18, дополнительная нормализация не нужна
         uint256 amountOut = (amountIn * priceIn) / priceOut;
-
         require(amountOut >= amountOutMin, "Slippage error");
 
-        // Сжигаем входные (юзер должен был сделать approve)
         MockToken(tokenIn).burn(msg.sender, amountIn);
-
-        // Минтим выходные
         MockToken(tokenOut).mint(to, amountOut);
 
         amounts = new uint256[](2);
         amounts[0] = amountIn;
         amounts[1] = amountOut;
-
-        return amounts;
     }
 }
