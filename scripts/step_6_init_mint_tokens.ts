@@ -40,7 +40,7 @@ async function main() {
   try {
     wethData = readDeploymentResult("step_1_deploy_weth_result.json");
     usdtData = readDeploymentResult("step_2_deploy_usdt_result.json");
-    pricesData = readDeploymentResult("step_6_init_set_prices_result.json");
+    pricesData = readDeploymentResult("step_5_init_set_prices_result.json");
   } catch (error: any) {
     console.error("❌ ERROR: Missing required files!");
     console.error("   Please run previous scripts first:");
@@ -111,7 +111,7 @@ async function main() {
     txHashes: [mintWethTx.hash, mintUsdtTx.hash]
   };
 
-  const resultFile = "step_7_init_mint_tokens_result.json";
+  const resultFile = "step_6_init_mint_tokens_result.json";
   writeResult(resultFile, result);
   console.log(`💾 Result saved to: ${resultFile}\n`);
 

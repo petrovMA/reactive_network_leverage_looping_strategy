@@ -103,7 +103,7 @@ async function main() {
     txHashes: [setPriceWethTx.hash, setPriceUsdtTx.hash]
   };
 
-  const resultFile = "step_6_init_set_prices_result.json";
+  const resultFile = "step_5_init_set_prices_result.json";
   writeResult(resultFile, result);
   console.log(`💾 Result saved to: ${resultFile}\n`);
 

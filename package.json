@@ -11,7 +11,7 @@
     "step:4": "hardhat run scripts/step_4_deploy_lending_pool.ts --network sepolia",
     "step:5": "hardhat run scripts/step_5_init_set_prices.ts --network sepolia",
     "step:6": "hardhat run scripts/step_6_init_mint_tokens.ts --network sepolia",
-    "step:7": "hardhat run scripts/step_7_init_register_assets_7.ts --network sepolia",
+    "step:7": "hardhat run scripts/step_7_init_register_assets.ts --network sepolia",
     "step:8": "hardhat run scripts/step_8_deploy_leverage_account.ts --network sepolia",
     "step:9": "hardhat run scripts/step_9_deploy_reactive.ts --network reactive",
     "test:loop": "hardhat run scripts/test_leverage_loop.ts --network sepolia",

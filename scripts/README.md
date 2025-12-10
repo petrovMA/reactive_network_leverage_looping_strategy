@@ -67,9 +67,9 @@ All deployment scripts generate result JSON files:
 - `step_2_deploy_usdt_result.json`
 - `step_3_deploy_router_result.json`
 - `step_4_deploy_lending_pool_result.json`
+- `step_5_init_set_prices_result.json`
+- `step_6_init_mint_tokens_result.json`
 - `step_7_init_register_assets_result.json`
-- `step_6_init_set_prices_result.json`
-- `step_7_init_mint_tokens_result.json`
 - `step_8_deploy_leverage_account_result.json`
 - `step_9_deploy_reactive_result.json`
 

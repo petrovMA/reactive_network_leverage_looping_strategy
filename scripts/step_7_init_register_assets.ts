@@ -42,7 +42,7 @@ async function main() {
     wethData = readDeploymentResult("step_1_deploy_weth_result.json");
     usdtData = readDeploymentResult("step_2_deploy_usdt_result.json");
     lendingPoolData = readDeploymentResult("step_4_deploy_lending_pool_result.json");
-    mintTokensData = readDeploymentResult("step_7_init_mint_tokens_result.json");
+    mintTokensData = readDeploymentResult("step_6_init_mint_tokens_result.json");
   } catch (error: any) {
     console.error("❌ ERROR: Missing required files!");
     console.error("   Please run previous scripts first:");
