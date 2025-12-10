@@ -28,41 +28,53 @@ function validateAddress(address: string): boolean {
 }
 
 async function main() {
-  console.log("🔧 Phase 1: Setting Token Prices in MockRouter...\n");
+  console.log("🔧 Phase 3: Registering Assets in MockLendingPool...\n");
 
   // Read deployment results
   console.log("📖 Reading deployment results...\n");
 
   let wethData: any;
   let usdtData: any;
-  let routerData: any;
+  let lendingPoolData: any;
+  let mintTokensData: any;
 
   try {
     wethData = readDeploymentResult("step_1_deploy_weth_result.json");
     usdtData = readDeploymentResult("step_2_deploy_usdt_result.json");
-    routerData = readDeploymentResult("step_3_deploy_router_result.json");
+    lendingPoolData = readDeploymentResult("step_4_deploy_lending_pool_result.json");
+    mintTokensData = readDeploymentResult("step_7_init_mint_tokens_result.json");
   } catch (error: any) {
-    console.error("❌ ERROR: Missing deployment files!");
-    console.error("   Please run deployment scripts first:");
+    console.error("❌ ERROR: Missing required files!");
+    console.error("   Please run previous scripts first:");
     console.error("   1. npm run step:1 (deploy WETH)");
     console.error("   2. npm run step:2 (deploy USDT)");
-    console.error("   3. npm run step:3 (deploy router)\n");
+    console.error("   3. npm run step:4 (deploy lending pool)");
+    console.error("   4. npm run step:6 (set prices)");
+    console.error("   5. npm run step:7 (mint tokens)\n");
+    process.exit(1);
+  }
+
+  // Validate previous step was completed
+  if (!mintTokensData.completed) {
+    console.error("❌ ERROR: Token minting not completed!");
+    console.error("   Please run: npm run step:7\n");
     process.exit(1);
   }
 
   const WETH_ADDRESS = wethData.address;
   const USDT_ADDRESS = usdtData.address;
-  const ROUTER_ADDRESS = routerData.address;
+  const LENDING_POOL_ADDRESS = lendingPoolData.address;
 
   // Validate addresses
-  if (!validateAddress(WETH_ADDRESS) || !validateAddress(USDT_ADDRESS) || !validateAddress(ROUTER_ADDRESS)) {
+  if (!validateAddress(WETH_ADDRESS) || !validateAddress(USDT_ADDRESS) || !validateAddress(LENDING_POOL_ADDRESS)) {
     console.error("❌ ERROR: One or more addresses are invalid!");
     process.exit(1);
   }
 
-  console.log(`✅ WETH:   ${WETH_ADDRESS}`);
-  console.log(`✅ USDT:   ${USDT_ADDRESS}`);
-  console.log(`✅ Router: ${ROUTER_ADDRESS}\n`);
+  console.log(`✅ WETH:        ${WETH_ADDRESS}`);
+  console.log(`✅ USDT:        ${USDT_ADDRESS}`);
+  console.log(`✅ LendingPool: ${LENDING_POOL_ADDRESS}`);
+  console.log(`✅ Tokens were minted (previous step completed)\n`);
 
   // Get deployer account
   const [deployer] = await ethers.getSigners();
@@ -73,50 +85,47 @@ async function main() {
   console.log(`👤 Deployer: ${deployerAddress}`);
   console.log(`💰 Balance: ${ethers.formatEther(balance)} ETH\n`);
 
-  // Get router contract instance
-  const router = await ethers.getContractAt("MockRouter", ROUTER_ADDRESS);
+  // Get lending pool contract instance
+  const lendingPool = await ethers.getContractAt("MockLendingPool", LENDING_POOL_ADDRESS);
 
-  // Set token prices
+  // Register assets
   console.log("----------------------------------------------------");
-  console.log("⏳ Setting token prices in MockRouter...");
+  console.log("⏳ Registering assets in MockLendingPool...");
 
-  const wethPrice = ethers.parseEther("3000"); // $3000 USD
-  const usdtPrice = ethers.parseEther("1");    // $1 USD
+  const addWethTx = await lendingPool.addAsset(WETH_ADDRESS);
+  await addWethTx.wait();
+  console.log(`✅ WETH registered as lending asset`);
+  console.log(`   Tx Hash: ${addWethTx.hash}`);
 
-  const setPriceWethTx = await router.setPrice(WETH_ADDRESS, wethPrice);
-  await setPriceWethTx.wait();
-  console.log(`✅ WETH price set to $3000`);
-  console.log(`   Tx Hash: ${setPriceWethTx.hash}`);
-
-  const setPriceUsdtTx = await router.setPrice(USDT_ADDRESS, usdtPrice);
-  await setPriceUsdtTx.wait();
-  console.log(`✅ USDT price set to $1`);
-  console.log(`   Tx Hash: ${setPriceUsdtTx.hash}`);
+  const addUsdtTx = await lendingPool.addAsset(USDT_ADDRESS);
+  await addUsdtTx.wait();
+  console.log(`✅ USDT registered as lending asset`);
+  console.log(`   Tx Hash: ${addUsdtTx.hash}`);
   console.log("----------------------------------------------------\n");
 
   // Save result to JSON
   const result = {
     completed: true,
-    wethPrice: "3000",
-    usdtPrice: "1",
+    assetsRegistered: ["WETH", "USDT"],
     timestamp: new Date().toISOString(),
-    txHashes: [setPriceWethTx.hash, setPriceUsdtTx.hash]
+    txHashes: [addWethTx.hash, addUsdtTx.hash]
   };
 
-  const resultFile = "step_6_init_set_prices_result.json";
+  const resultFile = "step_7_init_register_assets_result.json";
   writeResult(resultFile, result);
   console.log(`💾 Result saved to: ${resultFile}\n`);
 
   console.log("====================================================");
   console.log("📋 SUMMARY");
   console.log("====================================================");
-  console.log("✅ Prices Set:");
-  console.log("   - WETH: $3000");
-  console.log("   - USDT: $1");
+  console.log("✅ Lending Pool Assets:");
+  console.log("   - WETH registered");
+  console.log("   - USDT registered");
   console.log("====================================================\n");
 
-  console.log("✅ Price setting complete!");
-  console.log("\n💡 Next step: npm run step:7 (mint tokens)");
+  console.log("✅ Asset registration complete!");
+  console.log("\n💡 Mock system initialization finished!");
+  console.log("\n💡 Next step: npm run step:8 (deploy leverage account)");
 }
 
 main().catch((error) => {

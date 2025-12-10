@@ -101,7 +101,7 @@ async function main() {
   console.log("====================================================\n");
 
   console.log("✅ MockLendingPool deployment complete!");
-  console.log("\n💡 Next step: npm run step:6 (set prices)");
+  console.log("\n💡 Next step: npm run step:5 (set prices)");
 }
 
 main().catch((error) => {

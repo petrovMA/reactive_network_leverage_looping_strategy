@@ -28,47 +28,41 @@ function validateAddress(address: string): boolean {
 }
 
 async function main() {
-  console.log("🔧 Phase 2: Minting Initial Token Supplies...\n");
+  console.log("🔧 Phase 1: Setting Token Prices in MockRouter...\n");
 
   // Read deployment results
   console.log("📖 Reading deployment results...\n");
 
   let wethData: any;
   let usdtData: any;
-  let pricesData: any;
+  let routerData: any;
 
   try {
     wethData = readDeploymentResult("step_1_deploy_weth_result.json");
     usdtData = readDeploymentResult("step_2_deploy_usdt_result.json");
-    pricesData = readDeploymentResult("step_6_init_set_prices_result.json");
+    routerData = readDeploymentResult("step_3_deploy_router_result.json");
   } catch (error: any) {
-    console.error("❌ ERROR: Missing required files!");
-    console.error("   Please run previous scripts first:");
+    console.error("❌ ERROR: Missing deployment files!");
+    console.error("   Please run deployment scripts first:");
     console.error("   1. npm run step:1 (deploy WETH)");
     console.error("   2. npm run step:2 (deploy USDT)");
-    console.error("   3. npm run step:6 (set prices)\n");
-    process.exit(1);
-  }
-
-  // Validate previous step was completed
-  if (!pricesData.completed) {
-    console.error("❌ ERROR: Price setting not completed!");
-    console.error("   Please run: npm run step:6\n");
+    console.error("   3. npm run step:3 (deploy router)\n");
     process.exit(1);
   }
 
   const WETH_ADDRESS = wethData.address;
   const USDT_ADDRESS = usdtData.address;
+  const ROUTER_ADDRESS = routerData.address;
 
   // Validate addresses
-  if (!validateAddress(WETH_ADDRESS) || !validateAddress(USDT_ADDRESS)) {
+  if (!validateAddress(WETH_ADDRESS) || !validateAddress(USDT_ADDRESS) || !validateAddress(ROUTER_ADDRESS)) {
     console.error("❌ ERROR: One or more addresses are invalid!");
     process.exit(1);
   }
 
-  console.log(`✅ WETH: ${WETH_ADDRESS}`);
-  console.log(`✅ USDT: ${USDT_ADDRESS}`);
-  console.log(`✅ Prices were set (previous step completed)\n`);
+  console.log(`✅ WETH:   ${WETH_ADDRESS}`);
+  console.log(`✅ USDT:   ${USDT_ADDRESS}`);
+  console.log(`✅ Router: ${ROUTER_ADDRESS}\n`);
 
   // Get deployer account
   const [deployer] = await ethers.getSigners();
@@ -79,52 +73,50 @@ async function main() {
   console.log(`👤 Deployer: ${deployerAddress}`);
   console.log(`💰 Balance: ${ethers.formatEther(balance)} ETH\n`);
 
-  // Get contract instances
-  const wethToken = await ethers.getContractAt("MockToken", WETH_ADDRESS);
-  const usdtToken = await ethers.getContractAt("MockToken", USDT_ADDRESS);
+  // Get router contract instance
+  const router = await ethers.getContractAt("MockRouter", ROUTER_ADDRESS);
 
-  // Mint tokens
+  // Set token prices
   console.log("----------------------------------------------------");
-  console.log("⏳ Minting initial token supplies...");
+  console.log("⏳ Setting token prices in MockRouter...");
 
-  const wethMintAmount = ethers.parseEther("1000");      // 1000 WETH
-  const usdtMintAmount = ethers.parseEther("100000");    // 100,000 USDT
+  const wethPrice = ethers.parseEther("3000"); // $3000 USD
+  const usdtPrice = ethers.parseEther("1");    // $1 USD
 
-  const mintWethTx = await wethToken.mint(deployerAddress, wethMintAmount);
-  await mintWethTx.wait();
-  console.log(`✅ Minted 1000 WETH to deployer`);
-  console.log(`   Tx Hash: ${mintWethTx.hash}`);
+  const setPriceWethTx = await router.setPrice(WETH_ADDRESS, wethPrice);
+  await setPriceWethTx.wait();
+  console.log(`✅ WETH price set to $3000`);
+  console.log(`   Tx Hash: ${setPriceWethTx.hash}`);
 
-  const mintUsdtTx = await usdtToken.mint(deployerAddress, usdtMintAmount);
-  await mintUsdtTx.wait();
-  console.log(`✅ Minted 100,000 USDT to deployer`);
-  console.log(`   Tx Hash: ${mintUsdtTx.hash}`);
+  const setPriceUsdtTx = await router.setPrice(USDT_ADDRESS, usdtPrice);
+  await setPriceUsdtTx.wait();
+  console.log(`✅ USDT price set to $1`);
+  console.log(`   Tx Hash: ${setPriceUsdtTx.hash}`);
   console.log("----------------------------------------------------\n");
 
   // Save result to JSON
   const result = {
     completed: true,
-    wethMinted: "1000",
-    usdtMinted: "100000",
-    recipient: deployerAddress,
+    wethPrice: "3000",
+    usdtPrice: "1",
     timestamp: new Date().toISOString(),
-    txHashes: [mintWethTx.hash, mintUsdtTx.hash]
+    txHashes: [setPriceWethTx.hash, setPriceUsdtTx.hash]
   };
 
-  const resultFile = "step_7_init_mint_tokens_result.json";
+  const resultFile = "step_6_init_set_prices_result.json";
   writeResult(resultFile, result);
   console.log(`💾 Result saved to: ${resultFile}\n`);
 
   console.log("====================================================");
   console.log("📋 SUMMARY");
   console.log("====================================================");
-  console.log("✅ Tokens Minted:");
-  console.log(`   - Deployer WETH Balance: 1000`);
-  console.log(`   - Deployer USDT Balance: 100000`);
+  console.log("✅ Prices Set:");
+  console.log("   - WETH: $3000");
+  console.log("   - USDT: $1");
   console.log("====================================================\n");
 
-  console.log("✅ Token minting complete!");
-  console.log("\n💡 Next step: npm run step:5 (register assets)");
+  console.log("✅ Price setting complete!");
+  console.log("\n💡 Next step: npm run step:6 (mint tokens)");
 }
 
 main().catch((error) => {
