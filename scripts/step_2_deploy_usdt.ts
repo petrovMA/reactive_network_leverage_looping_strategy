@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { writeResult, getDeployerInfo, logHeader } from "./utils";
+import { writeResult, getDeployerInfo, logHeader, log } from "./utils";
 
 async function main() {
   console.log("Deploying USDT Token...\n");
@@ -28,6 +28,7 @@ async function main() {
   console.log(`Tx: ${txHash}`);
   console.log(`Etherscan: https://sepolia.etherscan.io/address/${usdtAddress}`);
   console.log("====================================================\n");
+  log.success("✓ USDT deployment complete!");
   console.log("Next: npm run step:3");
 }
 

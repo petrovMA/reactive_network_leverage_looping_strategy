@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { readResult, writeResult, getDeployerInfo, isValidAddress, logHeader } from "./utils";
+import { readResult, writeResult, getDeployerInfo, isValidAddress, logHeader, log } from "./utils";
 
 async function main() {
   console.log("Minting initial token supplies...\n");
@@ -11,13 +11,13 @@ async function main() {
     usdtData = readResult("step_2_deploy_usdt_result.json");
     pricesData = readResult("step_5_init_set_prices_result.json");
   } catch {
-    console.error("ERROR: Missing required files!");
+    log.error("✗ ERROR: Missing required files!");
     console.error("Please run steps 1, 2, and 5 first.\n");
     process.exit(1);
   }
 
   if (!pricesData.completed) {
-    console.error("ERROR: Price setting not completed!");
+    log.error("✗ ERROR: Price setting not completed!");
     process.exit(1);
   }
 
@@ -25,7 +25,7 @@ async function main() {
   const USDT = usdtData.address;
 
   if (!isValidAddress(WETH) || !isValidAddress(USDT)) {
-    console.error("ERROR: Token addresses are invalid!");
+    log.error("✗ ERROR: Token addresses are invalid!");
     process.exit(1);
   }
 
@@ -44,11 +44,13 @@ async function main() {
   console.log("Minting tokens...");
   const tx1 = await weth.mint(address, wethAmount);
   await tx1.wait();
-  console.log(`Minted 1000 WETH (tx: ${tx1.hash})`);
+  log.success("✓ Minted 1000 WETH");
+  console.log(`   Tx: ${tx1.hash}`);
 
   const tx2 = await usdt.mint(address, usdtAmount);
   await tx2.wait();
-  console.log(`Minted 100,000 USDT (tx: ${tx2.hash})\n`);
+  log.success("✓ Minted 100,000 USDT");
+  console.log(`   Tx: ${tx2.hash}\n`);
 
   writeResult("step_6_init_mint_tokens_result.json", {
     completed: true,
@@ -64,6 +66,7 @@ async function main() {
   console.log("WETH: 1000");
   console.log("USDT: 100,000");
   console.log("====================================================\n");
+  log.success("✓ Token minting complete!");
   console.log("Next: npm run step:7");
 }
 

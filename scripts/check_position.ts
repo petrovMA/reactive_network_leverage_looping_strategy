@@ -1,10 +1,18 @@
 import { ethers, network } from "hardhat";
 import * as fs from "fs";
 import * as path from "path";
+import chalk from "chalk";
 
 // ============================================================
 // HELPER FUNCTIONS
 // ============================================================
+
+const log = {
+  error: (msg: string) => console.log(chalk.red(msg)),
+  success: (msg: string) => console.log(chalk.green(msg)),
+  warn: (msg: string) => console.log(chalk.yellow(msg)),
+  info: (msg: string) => console.log(msg),
+};
 
 function readDeploymentResult(filePath: string): any {
   const fullPath = path.join(__dirname, filePath);
@@ -55,7 +63,7 @@ async function main() {
         usdtData = readDeploymentResult("step_2_deploy_usdt_result.json");
         leverageAccountData = readDeploymentResult("step_8_deploy_leverage_account_result.json");
     } catch (error: any) {
-        console.error("❌ ERROR: Missing deployment files!");
+        log.error("✗ ERROR: Missing deployment files!");
         process.exit(1);
     }
 
@@ -94,9 +102,9 @@ async function main() {
     console.log(`   Current LTV:            ${formatLTV(ltv)}`);
 
     if (collateral === 0n && debt === 0n) {
-        console.log("\n   ℹ️  No active position\n");
+        log.warn("\n   ⚠ No active position\n");
     } else {
-        console.log("\n   ✅ Active position found\n");
+        log.success("\n   ✓ Active position found\n");
     }
 
     // ============================================================
@@ -132,24 +140,24 @@ async function main() {
     console.log("====================================================\n");
 
     if (collateral > 0n || debt > 0n) {
-        console.log("✅ You have an active leverage position:");
+        log.success("✓ You have an active leverage position:");
         console.log("   → Use test_full_close_position.ts to close and get your collateral back\n");
     }
 
     if (contractWethBalance > 0n || contractUsdtBalance > 0n) {
-        console.log("✅ You have free tokens in the contract:");
+        log.success("✓ You have free tokens in the contract:");
         console.log("   → Use test_withdraw.ts to withdraw them\n");
     }
 
     if (contractWethBalance === 0n && contractUsdtBalance === 0n && collateral === 0n) {
-        console.log("⚠️  No tokens found:");
+        log.warn("⚠ No tokens found:");
         console.log("   → The contract has no free balance");
         console.log("   → The contract has no collateral in the lending pool");
         console.log("   → Nothing to withdraw\n");
     }
 
     if (contractEthBalance > 0n) {
-        console.log("✅ You have ETH in the contract:");
+        log.success("✓ You have ETH in the contract:");
         console.log(`   → ${formatAmount(contractEthBalance, 18, "ETH")} can be withdrawn using withdrawETH()\n`);
     }
 
@@ -157,6 +165,6 @@ async function main() {
 }
 
 main().catch((error) => {
-    console.error("\n❌ ERROR:", error.message);
+    log.error("\n✗ ERROR: " + error.message);
     process.exitCode = 1;
 });

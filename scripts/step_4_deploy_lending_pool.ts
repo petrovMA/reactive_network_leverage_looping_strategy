@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { readResult, writeResult, getDeployerInfo, isValidAddress, logHeader } from "./utils";
+import { readResult, writeResult, getDeployerInfo, isValidAddress, logHeader, log } from "./utils";
 
 async function main() {
   console.log("Deploying MockLendingPool...\n");
@@ -9,14 +9,14 @@ async function main() {
   try {
     routerData = readResult("step_3_deploy_router_result.json");
   } catch {
-    console.error("ERROR: step_3_deploy_router_result.json not found!");
+    log.error("✗ ERROR: step_3_deploy_router_result.json not found!");
     console.error("Please run: npm run step:3\n");
     process.exit(1);
   }
 
   const ROUTER = routerData.address;
   if (!isValidAddress(ROUTER)) {
-    console.error("ERROR: Router address is invalid!");
+    log.error("✗ ERROR: Router address is invalid!");
     process.exit(1);
   }
 
@@ -46,6 +46,7 @@ async function main() {
   console.log(`Tx: ${txHash}`);
   console.log(`Etherscan: https://sepolia.etherscan.io/address/${poolAddress}`);
   console.log("====================================================\n");
+  log.success("✓ MockLendingPool deployment complete!");
   console.log("Next: npm run step:5");
 }
 

@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { readResult, writeResult, getDeployerInfo, isValidAddress, getUserConfirmation, logHeader } from "./utils";
+import { readResult, writeResult, getDeployerInfo, isValidAddress, logHeader, log } from "./utils";
 
 const REACT_FUNDING = "0.05"; // REACT for RSC subscriptions
 
@@ -13,7 +13,7 @@ async function main() {
     wethData = readResult("step_1_deploy_weth_result.json");
     usdtData = readResult("step_2_deploy_usdt_result.json");
   } catch {
-    console.error("ERROR: Missing deployment files!");
+    log.error("✗ ERROR: Missing deployment files!");
     console.error("Please run step:8 first.\n");
     process.exit(1);
   }
@@ -24,12 +24,12 @@ async function main() {
   const EXPECTED_DEPLOYER = accountData.rscDeployer;
 
   if (!isValidAddress(LEVERAGE_ACCOUNT) || !isValidAddress(WETH) || !isValidAddress(USDT)) {
-    console.error("ERROR: One or more addresses are invalid!");
+    log.error("✗ ERROR: One or more addresses are invalid!");
     process.exit(1);
   }
 
   if (!isValidAddress(EXPECTED_DEPLOYER)) {
-    console.error("ERROR: RSC Deployer not found in step_8 result!");
+    log.error("✗ ERROR: RSC Deployer not found in step_8 result!");
     process.exit(1);
   }
 
@@ -38,7 +38,7 @@ async function main() {
   console.log(`Network: ${network} (Chain ID: ${chainId})`);
   console.log(`Deployer: ${address}`);
   console.log(`Expected: ${EXPECTED_DEPLOYER}`);
-  console.log(`Balance: ${balanceEth} ETH\n`);
+  console.log(`Balance: ${balanceEth} REACT\n`);
 
   // Verify deployer matches
   if (address.toLowerCase() !== EXPECTED_DEPLOYER.toLowerCase()) {
@@ -46,19 +46,13 @@ async function main() {
     console.log(`Current:  ${address}`);
     console.log(`Expected: ${EXPECTED_DEPLOYER}`);
     console.log("====================================================\n");
-    console.log("Switch wallet or redeploy LeverageAccount.");
+    log.error("✗ Switch wallet or redeploy LeverageAccount.");
     process.exit(1);
   }
 
-  console.log("Deployer verification: OK\n");
+  log.success("✓ Deployer verification: OK\n");
 
-  const confirmed = await getUserConfirmation("Continue with deployment? (y/n): ");
-  if (!confirmed) {
-    console.log("\nDeployment cancelled.\n");
-    process.exit(0);
-  }
-
-  console.log("\nDeploying...");
+  console.log("Deploying...");
 
   const LoopingRSC = await ethers.getContractFactory("LoopingRSC");
   const rsc = await LoopingRSC.deploy(LEVERAGE_ACCOUNT, WETH, USDT, {
@@ -93,6 +87,7 @@ async function main() {
   console.log(`  USDT: ${USDT}`);
   console.log("====================================================\n");
 
+  log.success("✓ LoopingRSC deployment complete!");
   console.log("RSC is ready to listen for events!");
   console.log("\nNext steps:");
   console.log("  1. npm run test:loop");

@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { readResult, writeResult, getDeployerInfo, isValidAddress, logHeader } from "./utils";
+import { readResult, writeResult, getDeployerInfo, isValidAddress, logHeader, log } from "./utils";
 
 const ETH_FUNDING = "0.01"; // ETH for callback payments
 
@@ -12,7 +12,7 @@ async function main() {
     poolData = readResult("step_4_deploy_lending_pool_result.json");
     routerData = readResult("step_3_deploy_router_result.json");
   } catch {
-    console.error("ERROR: Missing deployment files!");
+    log.error("✗ ERROR: Missing deployment files!");
     console.error("Please run steps 3 and 4 first.\n");
     process.exit(1);
   }
@@ -21,7 +21,7 @@ async function main() {
   const ROUTER = routerData.address;
 
   if (!isValidAddress(POOL) || !isValidAddress(ROUTER)) {
-    console.error("ERROR: Pool or Router address is invalid!");
+    log.error("✗ ERROR: Pool or Router address is invalid!");
     process.exit(1);
   }
 
@@ -74,7 +74,8 @@ async function main() {
   console.log(`Etherscan: https://sepolia.etherscan.io/address/${accountAddress}`);
   console.log("====================================================\n");
 
-  console.log("IMPORTANT: RSC Deployer address must match when deploying RSC!");
+  log.success("✓ LeverageAccount deployment complete!");
+  log.warn("\n⚠ IMPORTANT: RSC Deployer address must match when deploying RSC!");
   console.log(`RSC Deployer: ${rscDeployerAddress}\n`);
   console.log("Next: npm run step:9");
 }

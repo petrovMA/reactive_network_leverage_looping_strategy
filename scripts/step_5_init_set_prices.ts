@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { readResult, writeResult, getDeployerInfo, isValidAddress, logHeader } from "./utils";
+import { readResult, writeResult, getDeployerInfo, isValidAddress, logHeader, log } from "./utils";
 
 async function main() {
   console.log("Setting token prices in MockRouter...\n");
@@ -11,7 +11,7 @@ async function main() {
     usdtData = readResult("step_2_deploy_usdt_result.json");
     routerData = readResult("step_3_deploy_router_result.json");
   } catch {
-    console.error("ERROR: Missing deployment files!");
+    log.error("✗ ERROR: Missing deployment files!");
     console.error("Please run steps 1-3 first.\n");
     process.exit(1);
   }
@@ -21,7 +21,7 @@ async function main() {
   const ROUTER = routerData.address;
 
   if (!isValidAddress(WETH) || !isValidAddress(USDT) || !isValidAddress(ROUTER)) {
-    console.error("ERROR: One or more addresses are invalid!");
+    log.error("✗ ERROR: One or more addresses are invalid!");
     process.exit(1);
   }
 
@@ -39,11 +39,13 @@ async function main() {
   console.log("Setting prices...");
   const tx1 = await router.setPrice(WETH, wethPrice);
   await tx1.wait();
-  console.log(`WETH price set to $3000 (tx: ${tx1.hash})`);
+  log.success(`✓ WETH price set to $3000`);
+  console.log(`   Tx: ${tx1.hash}`);
 
   const tx2 = await router.setPrice(USDT, usdtPrice);
   await tx2.wait();
-  console.log(`USDT price set to $1 (tx: ${tx2.hash})\n`);
+  log.success(`✓ USDT price set to $1`);
+  console.log(`   Tx: ${tx2.hash}\n`);
 
   writeResult("step_5_init_set_prices_result.json", {
     completed: true,
@@ -57,10 +59,11 @@ async function main() {
   console.log("WETH: $3000");
   console.log("USDT: $1");
   console.log("====================================================\n");
+  log.success("✓ Price setting complete!");
   console.log("Next: npm run step:6");
 }
 
 main().catch((error) => {
-  console.error(error);
+  log.error("✗ " + error.message);
   process.exitCode = 1;
 });

@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { readResult, writeResult, getDeployerInfo, isValidAddress, logHeader } from "./utils";
+import { readResult, writeResult, getDeployerInfo, isValidAddress, logHeader, log } from "./utils";
 
 async function main() {
   console.log("Registering assets in MockLendingPool...\n");
@@ -12,13 +12,13 @@ async function main() {
     poolData = readResult("step_4_deploy_lending_pool_result.json");
     mintData = readResult("step_6_init_mint_tokens_result.json");
   } catch {
-    console.error("ERROR: Missing required files!");
+    log.error("✗ ERROR: Missing required files!");
     console.error("Please run steps 1, 2, 4, and 6 first.\n");
     process.exit(1);
   }
 
   if (!mintData.completed) {
-    console.error("ERROR: Token minting not completed!");
+    log.error("✗ ERROR: Token minting not completed!");
     process.exit(1);
   }
 
@@ -27,7 +27,7 @@ async function main() {
   const POOL = poolData.address;
 
   if (!isValidAddress(WETH) || !isValidAddress(USDT) || !isValidAddress(POOL)) {
-    console.error("ERROR: One or more addresses are invalid!");
+    log.error("✗ ERROR: One or more addresses are invalid!");
     process.exit(1);
   }
 
@@ -41,11 +41,13 @@ async function main() {
   console.log("Registering assets...");
   const tx1 = await pool.addAsset(WETH);
   await tx1.wait();
-  console.log(`WETH registered (tx: ${tx1.hash})`);
+  log.success("✓ WETH registered");
+  console.log(`   Tx: ${tx1.hash}`);
 
   const tx2 = await pool.addAsset(USDT);
   await tx2.wait();
-  console.log(`USDT registered (tx: ${tx2.hash})\n`);
+  log.success("✓ USDT registered");
+  console.log(`   Tx: ${tx2.hash}\n`);
 
   writeResult("step_7_init_register_assets_result.json", {
     completed: true,
@@ -58,6 +60,7 @@ async function main() {
   console.log("WETH: registered");
   console.log("USDT: registered");
   console.log("====================================================\n");
+  log.success("✓ Asset registration complete!");
   console.log("Next: npm run step:8");
 }
 

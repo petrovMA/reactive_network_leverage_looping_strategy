@@ -2,8 +2,17 @@ import { ethers, network } from "hardhat";
 import * as fs from "fs";
 import * as path from "path";
 import * as readline from "readline";
+import chalk from "chalk";
 
 const SCRIPTS_DIR = __dirname;
+
+// Colored logging utilities
+export const log = {
+  error: (msg: string) => console.log(chalk.red(msg)),
+  success: (msg: string) => console.log(chalk.green(msg)),
+  warn: (msg: string) => console.log(chalk.yellow(msg)),
+  info: (msg: string) => console.log(msg),
+};
 
 export function readResult(fileName: string): any {
   const fullPath = path.join(SCRIPTS_DIR, fileName);
