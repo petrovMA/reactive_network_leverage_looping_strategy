@@ -17,7 +17,8 @@
     "test:loop": "hardhat run scripts/test_leverage_loop.ts --network sepolia",
     "test:repay": "hardhat run scripts/test_repay_partial.ts --network sepolia",
     "test:close": "hardhat run scripts/test_full_close_position.ts --network sepolia",
-    "check:position": "hardhat run scripts/check_position.ts --network sepolia"
+    "check:position": "hardhat run scripts/check_position.ts --network sepolia",
+    "verify:leverage_contract": "hardhat run scripts/verify_leverage_contract.ts --network sepolia"
   },
   "dependencies": {
     "@chainlink/contracts": "^1.5.0",
