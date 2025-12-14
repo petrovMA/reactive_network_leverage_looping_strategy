@@ -106,23 +106,27 @@ contract LeverageAccount is AbstractCallback, Ownable {
         // 1. Borrow
         lendingPool.borrow(borrowAsset, amountToBorrow);
 
-        // 2. Swap borrowed asset to collateral
+        // 2. Swap
         IERC20(borrowAsset).approve(address(router), amountToBorrow);
         address[] memory path = new address[](2);
         path[0] = borrowAsset;
         path[1] = collateralAsset;
 
         uint256[] memory amounts = router.swapExactTokensForTokens(
-            amountToBorrow, amountOutMin, path, address(this), block.timestamp
+            amountToBorrow,
+            amountOutMin,
+            path,
+            address(this),
+            block.timestamp
         );
+        uint256 receivedCollateral = amounts[1];
 
-        // 3. Supply received collateral
-        uint256 received = amounts[1];
-        IERC20(collateralAsset).approve(address(lendingPool), received);
-        lendingPool.supply(collateralAsset, received);
+        // 3. Supply
+        IERC20(collateralAsset).approve(address(lendingPool), receivedCollateral);
+        lendingPool.supply(collateralAsset, receivedCollateral);
 
-        (,, uint256 ltv) = lendingPool.getUserAccountData(address(this));
-        emit LoopStepExecuted(amountToBorrow, received, ltv, iterationId);
+        (uint256 totalCollateral, uint256 totalDebt, uint256 currentLTV) = lendingPool.getUserAccountData(address(this));
+        emit LoopStepExecuted(totalCollateral, totalDebt, currentLTV, iterationId);
     }
 
     /// @notice Close position: repay all debt and withdraw collateral

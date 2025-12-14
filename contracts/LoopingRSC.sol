@@ -11,11 +11,12 @@ contract LoopingRSC is AbstractPausableReactive {
     uint64 private constant CALLBACK_GAS_LIMIT = 2000000;
 
     // Strategy parameters
-    uint256 private constant TARGET_LTV = 7500;      // 75.00%
-    uint256 private constant MAX_ITERATIONS = 3;
-    uint256 private constant PRICE_ETH = 3000;       // Mock price
-    uint256 private constant MIN_BORROW = 10e18;     // 10 USDT minimum
-    uint256 private constant MAX_BORROW = 500e18;    // 500 USDT cap per iteration
+    uint256 private constant TARGET_LTV = 6000;        // 60.00%
+    uint256 private constant PROTOCOL_MAX_LTV = 8200;  // 82.00%
+    uint256 private constant MAX_ITERATIONS = 5;
+    uint256 private constant PRICE_ETH = 3000;         // Mock price
+    uint256 private constant MIN_STEP_BORROW = 10e18;       // 10 USDT minimum
+    uint256 private constant MAX_STEP_BORROW = 5000e18;     // 5000 USDT cap per iteration
 
     // Event topic hashes
     uint256 private constant TOPIC_DEPOSITED = 0x73a19dd210f1a7f902193214c0ee91dd35ee5b4d920cba8d519eca65a7b488ca;
@@ -54,8 +55,8 @@ contract LoopingRSC is AbstractPausableReactive {
         (uint256 amount, uint256 currentLTV) = abi.decode(data, (uint256, uint256));
         if (currentLTV >= TARGET_LTV) return;
 
-        // First borrow: 40% of collateral value
-        uint256 borrowAmount = _clampBorrow((amount * PRICE_ETH * 40) / 100);
+        // First borrow: 80% of collateral value
+        uint256 borrowAmount = _clampBorrow((amount * PRICE_ETH * 80) / 100);
         if (borrowAmount > 0) {
             _sendCallback(borrowAmount, 1);
         }
@@ -63,22 +64,26 @@ contract LoopingRSC is AbstractPausableReactive {
 
     /// @dev Handle loop step completion - continue if not at target
     function _handleLoopStep(bytes calldata data) internal {
-        (, uint256 receivedCollateral, uint256 currentLTV, uint256 iterationId) =
-            abi.decode(data, (uint256, uint256, uint256, uint256));
+        (uint256 totalCollateral, uint256 totalDebt, uint256 currentLTV, uint256 iterationId) =
+                            abi.decode(data, (uint256, uint256, uint256, uint256));
 
         if (iterationId >= MAX_ITERATIONS || currentLTV >= TARGET_LTV) return;
 
-        // Next borrow: 60% of new collateral value
-        uint256 nextBorrow = _clampBorrow((receivedCollateral * PRICE_ETH * 60) / 100);
-        if (nextBorrow > 0) {
-            _sendCallback(nextBorrow, iterationId + 1);
+        uint256 maxPossibleDebt = (totalCollateral * PROTOCOL_MAX_LTV) / 10000;
+
+        if (maxPossibleDebt > totalDebt) {
+            uint256 borrowPower = maxPossibleDebt - totalDebt;
+            uint256 amountToBorrow = _clampBorrow((borrowPower * 98) / 100);
+            if (amountToBorrow > 0) {
+                _sendCallback(amountToBorrow, iterationId + 1);
+            }
         }
     }
 
     /// @dev Clamp borrow amount between MIN and MAX, return 0 if below MIN
     function _clampBorrow(uint256 amount) internal pure returns (uint256) {
-        if (amount < MIN_BORROW) return 0;
-        return amount > MAX_BORROW ? MAX_BORROW : amount;
+        if (amount < MIN_STEP_BORROW) return 0;
+        return amount > MAX_STEP_BORROW ? MAX_STEP_BORROW : amount;
     }
 
     /// @dev Emit callback to execute leverage step on Sepolia
@@ -107,7 +112,7 @@ contract LoopingRSC is AbstractPausableReactive {
     function withdrawNative() external onlyOwner {
         uint256 bal = address(this).balance;
         require(bal > 0, "No balance");
-        (bool ok, ) = payable(msg.sender).call{value: bal}("");
+        (bool ok,) = payable(msg.sender).call{value: bal}("");
         require(ok, "Transfer failed");
     }
 }
