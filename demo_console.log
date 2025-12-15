@@ -1,0 +1,464 @@
+asus~/Blockchain/Reactive-Network/reactive_network_leverage_looping_strategy/scripts$ npm run step:1 && npm run step:2 && npm run step:3 && npm run step:4 && npm run step:6 && npm run step:7 && npm run step:5 && npm run step:8
+
+> reactive-oracle-mirror@1.0.0 step:1
+> hardhat run scripts/step_1_deploy_weth.ts --network sepolia
+
+Deploying WETH Token...
+
+Network: sepolia (Chain ID: 11155111)
+Deployer: 0x75b3aEe6908D0447dD598bf183Bdc955ae280Ca1
+Balance: 1.40844101181572644 ETH
+
+====================================================
+DEPLOYMENT COMPLETE
+====================================================
+WETH: 0x9E09E9e0A85c7A93bF33f0D32F3492c5b69ae7D8
+Tx: 0x5bc8940ebe1f101e5609f6ec83c0b3e8d1cf3e3370bc750538d7fae8bf473f18
+Etherscan: https://sepolia.etherscan.io/address/0x9E09E9e0A85c7A93bF33f0D32F3492c5b69ae7D8
+====================================================
+
+✓ WETH deployment complete!
+Next: npm run step:2
+
+> reactive-oracle-mirror@1.0.0 step:2
+> hardhat run scripts/step_2_deploy_usdt.ts --network sepolia
+
+Deploying USDT Token...
+
+Network: sepolia (Chain ID: 11155111)
+Deployer: 0x75b3aEe6908D0447dD598bf183Bdc955ae280Ca1
+Balance: 1.408437354728070582 ETH
+
+====================================================
+DEPLOYMENT COMPLETE
+====================================================
+USDT: 0xF76a94b465e29fe06296501eED5217fa199c0c1F
+Tx: 0x0df637021708b6b229183892a4afa833d0bdfe2afaf5af5d704981f84a6cd9d7
+Etherscan: https://sepolia.etherscan.io/address/0xF76a94b465e29fe06296501eED5217fa199c0c1F
+====================================================
+
+✓ USDT deployment complete!
+Next: npm run step:3
+
+> reactive-oracle-mirror@1.0.0 step:3
+> hardhat run scripts/step_3_deploy_router.ts --network sepolia
+
+Deploying MockRouter...
+
+Network: sepolia (Chain ID: 11155111)
+Deployer: 0x75b3aEe6908D0447dD598bf183Bdc955ae280Ca1
+Balance: 2.40843215103226574 ETH
+
+====================================================
+DEPLOYMENT COMPLETE
+====================================================
+MockRouter: 0xf734E5A1e0c2eC0cb05EaeEB75069F963c437d41
+Tx: 0x163e00576cba69d304d8c14f97a66d8109955d4f70c0ffa1b1b4f78ff07b341c
+Etherscan: https://sepolia.etherscan.io/address/0xf734E5A1e0c2eC0cb05EaeEB75069F963c437d41
+====================================================
+
+✓ MockRouter deployment complete!
+Next: npm run step:4
+
+> reactive-oracle-mirror@1.0.0 step:4
+> hardhat run scripts/step_4_deploy_lending_pool.ts --network sepolia
+
+Deploying MockLendingPool...
+
+Network: sepolia (Chain ID: 11155111)
+Deployer: 0x75b3aEe6908D0447dD598bf183Bdc955ae280Ca1
+Balance: 2.408430521654682606 ETH
+Router: 0xf734E5A1e0c2eC0cb05EaeEB75069F963c437d41
+
+====================================================
+DEPLOYMENT COMPLETE
+====================================================
+MockLendingPool: 0x44e569879E69d967aEc04fbB2B34658c8b492b9F
+Router: 0xf734E5A1e0c2eC0cb05EaeEB75069F963c437d41
+Tx: 0xf77802cb4db8602ce025e305c8442f70470bf123a3ec486c80afca6cdeeeed62
+Etherscan: https://sepolia.etherscan.io/address/0x44e569879E69d967aEc04fbB2B34658c8b492b9F
+====================================================
+
+✓ MockLendingPool deployment complete!
+Next: npm run step:5
+
+> reactive-oracle-mirror@1.0.0 step:6
+> hardhat run scripts/step_6_init_mint_tokens.ts --network sepolia
+
+Minting initial token supplies...
+
+Network: sepolia (Chain ID: 11155111)
+Deployer: 0x75b3aEe6908D0447dD598bf183Bdc955ae280Ca1
+Balance: 2.40842805635093713 ETH
+
+Minting tokens...
+✓ Minted 1000 WETH
+   Tx: 0x67affc7f46cd5a42a59cbb053817454d9496c7c107ae25c81cc9f3ed31dd411d
+✓ Minted 100,000 USDT
+   Tx: 0x9b9f56fdcd8c01c6a502e4e6b51eb153b88ac4196839e1b308d82d1762dad70f
+
+====================================================
+TOKENS MINTED
+====================================================
+Recipient: 0x75b3aEe6908D0447dD598bf183Bdc955ae280Ca1
+WETH: 1000
+USDT: 100,000
+====================================================
+
+✓ Token minting complete!
+Next: npm run step:7
+
+> reactive-oracle-mirror@1.0.0 step:7
+> hardhat run scripts/step_7_init_register_assets.ts --network sepolia
+
+Registering assets in MockLendingPool...
+
+Network: sepolia (Chain ID: 11155111)
+Deployer: 0x75b3aEe6908D0447dD598bf183Bdc955ae280Ca1
+Balance: 2.408427612551166552 ETH
+
+Registering assets...
+✓ WETH registered
+   Tx: 0x5d6fd584c2884104630fe6975ae72ef037fcd35c3f1f5a611a628676c4e11367
+✓ USDT registered
+   Tx: 0xd8800dd7d7d336ad0976296cc713f0ad3fd41ef386cf88563988f99e67070045
+
+====================================================
+ASSETS REGISTERED
+====================================================
+WETH: registered
+USDT: registered
+====================================================
+
+✓ Asset registration complete!
+Next: npm run step:8
+
+> reactive-oracle-mirror@1.0.0 step:5
+> hardhat run scripts/step_5_init_set_prices.ts --network sepolia
+
+Setting token prices in MockRouter...
+
+Network: sepolia (Chain ID: 11155111)
+Deployer: 0x75b3aEe6908D0447dD598bf183Bdc955ae280Ca1
+Balance: 2.408427095371260302 ETH
+
+Setting prices...
+✓ WETH price set to $3000
+   Tx: 0x50e13ec360331fd6703d8346ba2e65aa1cc04d6e7d8dd2d0fa687fa31c2dcec4
+✓ USDT price set to $1
+   Tx: 0x71cdba167fb3bd88c12c2ad7b9036bc3492942ef5325dbb58a9d2c5b4dc0dc78
+
+====================================================
+PRICES SET
+====================================================
+WETH: $3000
+USDT: $1
+====================================================
+
+✓ Price setting complete!
+Next: npm run step:6
+
+> reactive-oracle-mirror@1.0.0 step:8
+> hardhat run scripts/step_8_deploy_leverage_account.ts --network sepolia
+
+Deploying LeverageAccount...
+
+Network: sepolia
+Deployer: 0x75b3aEe6908D0447dD598bf183Bdc955ae280Ca1
+Balance: 2.408426753372638742 ETH
+RSC Deployer: 0x537b27d03a24157c5Fe2B0915b00df73C80C5643
+Pool: 0x44e569879E69d967aEc04fbB2B34658c8b492b9F
+Router: 0xf734E5A1e0c2eC0cb05EaeEB75069F963c437d41
+Callback Proxy: 0xc9f36411C9897e7F959D99ffca2a0Ba7ee0D7bDA
+
+====================================================
+DEPLOYMENT COMPLETE
+====================================================
+LeverageAccount: 0x729042614618F24bE3ed3e0b824A0be0B4da1bcE
+Pool: 0x44e569879E69d967aEc04fbB2B34658c8b492b9F
+Router: 0xf734E5A1e0c2eC0cb05EaeEB75069F963c437d41
+Callback Proxy: 0xc9f36411C9897e7F959D99ffca2a0Ba7ee0D7bDA
+RSC Deployer: 0x537b27d03a24157c5Fe2B0915b00df73C80C5643
+ETH Funded: 0.01
+Tx: 0xddf70e3aa705691315ac7c379acd55833ba1afe6716dc7b8be0bbc3fc7ca3568
+Etherscan: https://sepolia.etherscan.io/address/0x729042614618F24bE3ed3e0b824A0be0B4da1bcE
+====================================================
+
+✓ LeverageAccount deployment complete!
+
+⚠ IMPORTANT: RSC Deployer address must match when deploying RSC!
+RSC Deployer: 0x537b27d03a24157c5Fe2B0915b00df73C80C5643
+
+Next: npm run step:9
+asus~/Blockchain/Reactive-Network/reactive_network_leverage_looping_strategy/scripts$ npm run step:9
+
+> reactive-oracle-mirror@1.0.0 step:9
+> hardhat run scripts/step_9_deploy_reactive.ts --network reactive
+
+Deploying LoopingRSC on Reactive Network...
+
+Network: reactive (Chain ID: 5318007)
+Deployer: 0x537b27d03a24157c5Fe2B0915b00df73C80C5643
+Expected: 0x537b27d03a24157c5Fe2B0915b00df73C80C5643
+Balance: 4.221605464 REACT
+
+✓ Deployer verification: OK
+
+Deploying...
+====================================================
+DEPLOYMENT COMPLETE
+====================================================
+LoopingRSC: 0xA9B6Bac1274045657481703a30E40E4456060C4b
+RSC Deployer: 0x537b27d03a24157c5Fe2B0915b00df73C80C5643
+REACT Funded: 0.05
+Tx: 0xc46b9a5cadfe510ad5d2398760f6652980cb25c0e4006296b039caea07108672
+
+Sepolia contracts:
+  LeverageAccount: 0x729042614618F24bE3ed3e0b824A0be0B4da1bcE
+  WETH: 0x9E09E9e0A85c7A93bF33f0D32F3492c5b69ae7D8
+  USDT: 0xF76a94b465e29fe06296501eED5217fa199c0c1F
+====================================================
+
+✓ LoopingRSC deployment complete!
+RSC is ready to listen for events!
+
+Next steps:
+  1. npm run test:loop
+  2. npm run check:position
+asus~/Blockchain/Reactive-Network/reactive_network_leverage_looping_strategy/scripts$ npm run test:loop
+
+> reactive-oracle-mirror@1.0.0 test:loop
+> hardhat run scripts/test_leverage_loop.ts --network sepolia
+
+🚀 Starting Leverage Loop Test...
+
+📡 Network: sepolia (Chain ID: 11155111)
+👤 Tester: 0x75b3aEe6908D0447dD598bf183Bdc955ae280Ca1
+💰 Balance: 2.398421329595089828 ETH
+
+📖 Reading deployment results...
+
+----------------------------------------------------
+📋 CONFIGURATION
+----------------------------------------------------
+WETH Token:       0x9E09E9e0A85c7A93bF33f0D32F3492c5b69ae7D8
+LeverageAccount:  0x729042614618F24bE3ed3e0b824A0be0B4da1bcE
+Deposit Amount:   0.4 WETH
+----------------------------------------------------
+
+✅ WETH Balance: 1000.0 WETH
+
+
+✍️  Step 1: Signing Permit (Gasless Approval)...
+   Generating EIP-712 Signature for 'depositWithPermit'...
+✅ Permit Signed successfully!
+   v: 28
+   r: 0x82b2feb4a8d198f5ecc5c16184447c746751c2845297763b169154860b1f1485
+   s: 0x72e6ae66f88515bb187aa47903c2aee94cdc39174f246cff922f85253d42d5dc
+
+⏳ Step 2: Executing 'depositWithPermit'...
+   (This creates 1 transaction instead of 2: Permit + Transfer + Supply)
+   Transaction submitted: 0xaff088344c502e1f2a8c635b1efd06dfdb6942addd41eb4e27689f97ff7e488c
+✅ Deposit successful!
+📍 Transaction: 0xaff088344c502e1f2a8c635b1efd06dfdb6942addd41eb4e27689f97ff7e488c
+🔍 View on Etherscan: https://sepolia.etherscan.io/tx/0xaff088344c502e1f2a8c635b1efd06dfdb6942addd41eb4e27689f97ff7e488c
+
+📊 Initial Position Created:
+   Current LTV: 0.00%
+
+----------------------------------------------------
+🔄 MONITORING REACTIVE LOOP
+----------------------------------------------------
+⏳ Waiting for Reactive Network to trigger leverage steps...
+
+📈 ITERATION #1 EXECUTED
+   Tx: https://sepolia.etherscan.io/tx/0xcb4ce0cee0dc1c4df327b1c56d4a78a65410d3493020dac39a0f61094dd4bc60
+   New LTV: 35.48% [████░░░░░░] 47%
+
+📈 ITERATION #3 EXECUTED
+   Tx: https://sepolia.etherscan.io/tx/0xb94201e63a52658fadd9cb187b14a38c82ad0c5d054dd76f2c2fd27d882cd943
+   New LTV: 63.45% [████████░░] 85%
+
+====================================================
+✅ STRATEGY EXECUTION COMPLETE
+   Reason: max_iterations
+   Initial LTV: 0.00%
+   Final LTV: 63.45%
+   Iterations: 2
+====================================================
+
+💾 Test result saved to: test_leverage_loop_result.json
+
+🎉 Test Complete!
+^C
+asus~/Blockchain/Reactive-Network/reactive_network_leverage_looping_strategy/scripts$ npm run check:position
+
+> reactive-oracle-mirror@1.0.0 check:position
+> hardhat run scripts/check_position.ts --network sepolia
+
+🔍 Checking Leverage Position Status...
+
+📡 Network: sepolia (Chain ID: 11155111)
+👤 User: 0x75b3aEe6908D0447dD598bf183Bdc955ae280Ca1
+
+📖 Reading deployment results...
+
+📋 Addresses:
+   WETH Token:       0x9E09E9e0A85c7A93bF33f0D32F3492c5b69ae7D8
+   USDT Token:       0xF76a94b465e29fe06296501eED5217fa199c0c1F
+   LeverageAccount:  0x729042614618F24bE3ed3e0b824A0be0B4da1bcE
+
+====================================================
+💼 LEVERAGE POSITION (In Lending Pool)
+====================================================
+   Total Collateral Value: 3283.746 USD
+   Total Debt Value:       2083.746 USD
+   Current LTV:            63.45%
+
+   ✓ Active position found
+
+====================================================
+💰 FREE TOKEN BALANCES (Not in Lending Pool)
+====================================================
+LeverageAccount Free Balances:
+   WETH: 0.0 WETH
+   USDT: 0.0 USDT
+   ETH:  0.009997734109054769 ETH
+
+Your Wallet Balances:
+   WETH: 999.6 WETH
+   USDT: 100000.0 USDT
+
+====================================================
+💡 WHAT YOU CAN DO
+====================================================
+
+✓ You have an active leverage position:
+   → Use test_full_close_position.ts to close and get your collateral back
+
+✓ You have ETH in the contract:
+   → 0.009997734109054769 ETH can be withdrawn using withdrawETH()
+
+====================================================
+asus~/Blockchain/Reactive-Network/reactive_network_leverage_looping_strategy/scripts$ npm run test:close
+
+> reactive-oracle-mirror@1.0.0 test:close
+> hardhat run scripts/test_full_close_position.ts --network sepolia
+
+🚀 Starting Full Close Position Test...
+
+📡 Network: sepolia (Chain ID: 11155111)
+👤 Tester: 0x75b3aEe6908D0447dD598bf183Bdc955ae280Ca1
+💰 Balance: 2.398420685255807108 ETH
+
+📖 Reading deployment results...
+
+----------------------------------------------------
+📋 CONFIGURATION
+----------------------------------------------------
+WETH Token:       0x9E09E9e0A85c7A93bF33f0D32F3492c5b69ae7D8
+USDT Token:       0xF76a94b465e29fe06296501eED5217fa199c0c1F
+LeverageAccount:  0x729042614618F24bE3ed3e0b824A0be0B4da1bcE
+----------------------------------------------------
+
+📊 Checking Current Position...
+
+Current Status:
+   Collateral: 3283.746 USD
+   Debt:       2083.746 USD
+   LTV:        63.45%
+
+💰 Preparing to repay debt...
+
+Your USDT Balance: 100000.0 USDT
+
+✍️  Step 1: Approving LeverageAccount to spend 2083.746 USDT...
+✅ Approval successful!
+
+----------------------------------------------------
+🔄 CLOSING POSITION
+----------------------------------------------------
+⏳ Executing fullClosePosition...
+   Transaction submitted: 0x08cfb9e41e4ba6ddb77e2a32c4ebd0dd38065087d0e92b98b89ba675cd4b8228
+✅ Position closed successfully!
+📍 Transaction: 0x08cfb9e41e4ba6ddb77e2a32c4ebd0dd38065087d0e92b98b89ba675cd4b8228
+🔍 View on Etherscan: https://sepolia.etherscan.io/tx/0x08cfb9e41e4ba6ddb77e2a32c4ebd0dd38065087d0e92b98b89ba675cd4b8228
+
+📋 Position Close Summary:
+   Debt Repaid:         2083.746 USDT
+   Collateral Returned: 1.094582 WETH
+
+----------------------------------------------------
+✅ FINAL STATE
+----------------------------------------------------
+User Token Balances:
+   WETH: 999.6 → 1000.694582
+   Change: +1.094582 WETH
+
+   USDT: 100000.0 → 97916.254
+   Change: -2083.746 USDT
+
+Leverage Position:
+   Collateral: 0.0 USD
+   Debt:       0.0 USD
+   LTV:        0.00%
+
+✅ Position fully closed! No remaining collateral or debt.
+
+====================================================
+🎉 Test Complete!
+====================================================
+
+💾 Test result saved to: test_full_close_position_result.json
+
+asus~/Blockchain/Reactive-Network/reactive_network_leverage_looping_strategy/scripts$ npm run check:position
+
+> reactive-oracle-mirror@1.0.0 check:position
+> hardhat run scripts/check_position.ts --network sepolia
+
+🔍 Checking Leverage Position Status...
+
+📡 Network: sepolia (Chain ID: 11155111)
+👤 User: 0x75b3aEe6908D0447dD598bf183Bdc955ae280Ca1
+
+📖 Reading deployment results...
+
+📋 Addresses:
+   WETH Token:       0x9E09E9e0A85c7A93bF33f0D32F3492c5b69ae7D8
+   USDT Token:       0xF76a94b465e29fe06296501eED5217fa199c0c1F
+   LeverageAccount:  0x729042614618F24bE3ed3e0b824A0be0B4da1bcE
+
+====================================================
+💼 LEVERAGE POSITION (In Lending Pool)
+====================================================
+   Total Collateral Value: 0.0 USD
+   Total Debt Value:       0.0 USD
+   Current LTV:            0.00%
+
+   ⚠ No active position
+
+====================================================
+💰 FREE TOKEN BALANCES (Not in Lending Pool)
+====================================================
+LeverageAccount Free Balances:
+   WETH: 0.0 WETH
+   USDT: 0.0 USDT
+   ETH:  0.009997734109054769 ETH
+
+Your Wallet Balances:
+   WETH: 1000.694582 WETH
+   USDT: 97916.254 USDT
+
+====================================================
+💡 WHAT YOU CAN DO
+====================================================
+
+⚠ No tokens found:
+   → The contract has no free balance
+   → The contract has no collateral in the lending pool
+   → Nothing to withdraw
+
+✓ You have ETH in the contract:
+   → 0.009997734109054769 ETH can be withdrawn using withdrawETH()
+
+====================================================

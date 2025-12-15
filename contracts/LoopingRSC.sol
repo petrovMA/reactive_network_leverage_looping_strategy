@@ -12,7 +12,7 @@ contract LoopingRSC is AbstractPausableReactive {
 
     // Strategy parameters
     uint256 private constant TARGET_LTV = 6000;        // 60.00%
-    uint256 private constant PROTOCOL_MAX_LTV = 8200;  // 82.00%
+    uint256 private constant PROTOCOL_MAX_LTV = 8000;  // 80.00%
     uint256 private constant MAX_ITERATIONS = 5;
     uint256 private constant PRICE_ETH = 3000;         // Mock price
     uint256 private constant MIN_STEP_BORROW = 10e18;       // 10 USDT minimum
@@ -55,8 +55,8 @@ contract LoopingRSC is AbstractPausableReactive {
         (uint256 amount, uint256 currentLTV) = abi.decode(data, (uint256, uint256));
         if (currentLTV >= TARGET_LTV) return;
 
-        // First borrow: 80% of collateral value
-        uint256 borrowAmount = _clampBorrow((amount * PRICE_ETH * 80) / 100);
+        // First borrow: 55% of collateral value
+        uint256 borrowAmount = _clampBorrow((amount * PRICE_ETH * 55) / 100);
         if (borrowAmount > 0) {
             _sendCallback(borrowAmount, 1);
         }
@@ -73,7 +73,7 @@ contract LoopingRSC is AbstractPausableReactive {
 
         if (maxPossibleDebt > totalDebt) {
             uint256 borrowPower = maxPossibleDebt - totalDebt;
-            uint256 amountToBorrow = _clampBorrow((borrowPower * 98) / 100);
+            uint256 amountToBorrow = _clampBorrow((borrowPower * 95) / 100);
             if (amountToBorrow > 0) {
                 _sendCallback(amountToBorrow, iterationId + 1);
             }

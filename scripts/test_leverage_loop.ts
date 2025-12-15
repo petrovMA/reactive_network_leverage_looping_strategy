@@ -3,10 +3,10 @@ import * as fs from "fs";
 import * as path from "path";
 
 // Test parameters
-const DEPOSIT_AMOUNT = ethers.parseEther("1.0");
+const DEPOSIT_AMOUNT = ethers.parseEther("0.4");
 
 // Constants
-const TARGET_LTV = 7500; // 75.00%
+const TARGET_LTV = 6000; // 60.00%
 const MAX_ITERATIONS = 3;
 const MONITORING_TIMEOUT = 3 * 60 * 1000; // 3 minutes
 
